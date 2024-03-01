@@ -107,6 +107,7 @@ public class FileUtils {
     }
 
     private static File createFile(Context context, Uri uri) {
+        //Zaw Moe Oo changes
         Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
         if (cursor == null) {
             return null;
@@ -116,7 +117,7 @@ public class FileUtils {
             return null;
         }
         String name = cursor.getString(nameIndex);
-        File file = new File(context.getCacheDir(), name);
+        File file = new File(context.getExternalFilesDir("Temp"), name); //For my App
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             FileOutputStream outputStream = new FileOutputStream(file);

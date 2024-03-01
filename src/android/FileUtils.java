@@ -107,32 +107,33 @@ public class FileUtils {
     }
 
     private static File createFile(Context context, Uri uri) {
-        try {
-            String name = getName(context, uri);
-            File file = new File(context.getExternalCacheDir(), name);
-            if (file.exists()) {
-                int ext = name.lastIndexOf('.');
-                String prefix = name, suffix = "";
-                if(ext > 0) {
-                    prefix = name.substring(0, ext);
-                    suffix = name.substring(ext);
-                }
-                name = prefix + "_" + System.currentTimeMillis() + suffix;
-                file = new File(context.getExternalCacheDir(), name);
-            }
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
-            try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                int read;
-                byte[] bytes = new byte[1024];
-                while ((read = inputStream.read(bytes)) != -1) {
-                    outputStream.write(bytes, 0, read);
-                }
-                outputStream.flush();
-            }
-            return file;
-        } catch (Exception e) {
-            Log.e(TAG, "Exception occured", e);
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) {
+            return null;
         }
-        return  null;
+        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        if (!cursor.moveToFirst()) {
+            return null;
+        }
+        String name = cursor.getString(nameIndex);
+        File file = new File(context.getCacheDir(), name);
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            FileOutputStream outputStream = new FileOutputStream(file);
+            int read;
+            int maxBufferSize = 1024 * 1024;
+            int bufferSize = Math.min(inputStream.available(), maxBufferSize);
+            final byte[] buffers = new byte[bufferSize];
+            while ((read = inputStream.read(buffers)) != -1) {
+                outputStream.write(buffers, 0, read);
+            }
+            inputStream.close();
+            outputStream.close();
+        } catch (Exception e) {
+            return null;
+        } finally {
+            cursor.close();
+        }
+        return file; 
     }
 }

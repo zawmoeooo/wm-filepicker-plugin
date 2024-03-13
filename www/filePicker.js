@@ -58,7 +58,8 @@ FilePicker.prototype.selectImage = function(multiple, successCallback, errorCall
     var options = {
         "multiple": multiple,
         "type": "IMAGE",
-        "useCustomLibrary": !!onLibraryChoosen
+        "useCustomLibrary": !!onLibraryChoosen,
+        "useICloud:: false
     };
     this.select(options, function(paths) {
         if (paths.length > 0 && paths[0] === 'use-custom-library') {
@@ -73,7 +74,8 @@ FilePicker.prototype.selectVideo = function(multiple, successCallback, errorCall
     var options = {
         "multiple": multiple,
         "type": "VIDEO",
-        "useCustomLibrary": !!onLibraryChoosen
+        "useCustomLibrary": !!onLibraryChoosen,
+        "useICloud:: false
     };
     this.select(options, function(paths) {
         if (paths.length > 0 && paths[0] === 'use-custom-library') {
